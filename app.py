@@ -133,13 +133,13 @@ def api_call(method, endpoint, data=None):
     url = f"{API_URL}{endpoint}"
     try:
         if method == "GET":
-            response = requests.get(url, headers=get_headers(), timeout=5)
+            response = requests.get(url, headers=get_headers(), timeout=10)
         elif method == "POST":
-            response = requests.post(url, json=data, headers=get_headers(), timeout=5)
+            response = requests.post(url, json=data, headers=get_headers(), timeout=10)
         elif method == "PATCH":
-            response = requests.patch(url, json=data, headers=get_headers(), timeout=5)
+            response = requests.patch(url, json=data, headers=get_headers(), timeout=10)
         elif method == "DELETE":
-            response = requests.delete(url, headers=get_headers(), timeout=5)
+            response = requests.delete(url, headers=get_headers(), timeout=10)
 
         # If backend returns a client/server error with JSON body, raise so callers see it
         if 400 <= response.status_code < 600:
@@ -160,7 +160,7 @@ def api_call(method, endpoint, data=None):
         st.error("Cannot connect to backend. Make sure the server is running on http://localhost:4000")
         return None
     except requests.exceptions.Timeout:
-        st.error("API request timed out")
+        st.error("API request timed out (check backend status)")
         return None
     except Exception as e:
         # Show a brief error to the user but log full exception to console for debugging
@@ -195,14 +195,20 @@ def login_page():
         password = st.text_input("Password", type="password", placeholder="Enter your password")
         
         if st.button("Login", use_container_width=True, type="primary"):
-            result = api_call("POST", "/auth/login", {"email": email, "password": password})
-            if result and 'token' in result:
-                st.session_state.token = result['token']
-                st.session_state.user = result['user']
-                st.success("Login successful")
-                st.rerun()
+            if not email or not password:
+                st.error("Please enter both email and password")
             else:
-                st.error("Invalid credentials")
+                with st.spinner("Logging in..."):
+                    result = api_call("POST", "/auth/login", {"email": email, "password": password})
+                    if result and isinstance(result, dict) and 'token' in result:
+                        st.session_state.token = result['token']
+                        st.session_state.user = result['user']
+                        st.success("Login successful")
+                        st.rerun()
+                    elif result is None:
+                        st.error("Could not connect to the server. Please check backend status.")
+                    else:
+                        st.error("Invalid credentials or server error")
         
         st.divider()
         # Add employee-only sign up option (no demo credentials shown in UI)
@@ -229,7 +235,7 @@ def login_page():
                     # Try to create user via backend first and handle 403/connection failures by saving a local pending request
                     # Note: signup endpoint does NOT require auth (allow new employees to self-register)
                     try:
-                        resp = requests.post(f"{API_URL}/users/signup", json=payload, timeout=5, headers={})
+                        resp = requests.post(f"{API_URL}/users/signup", json=payload, timeout=10, headers={})
                         if resp.status_code in (200, 201):
                             st.success("Account created successfully. You can now login.")
                         elif resp.status_code == 403:

@@ -1,0 +1,57 @@
+{
+  "users": [
+    {
+      "id": "A6lScs5d7v-wxK5DKk5jK",
+      "email": "mounishm@rljit.in",
+      "password": "$2a$08$.LSYQ.bYQoNkv0OTZzDB9eGsM614C71O8Ng8S8aChLkYJD0bDHUHC",
+      "fullName": "mouni",
+      "role": "ADMIN",
+      "createdAt": 1764792413163
+    },
+    {
+      "id": "Vo8m_abrjVQVpAwM3TkCZ",
+      "email": "manager@local",
+      "password": "$2a$08$7AuhCPY6Phk73Jh3IHmmBeULSCQc2y/8FAz4NKo2miYUI4MxoZ0V6",
+      "fullName": "Manager User",
+      "role": "MANAGER",
+      "createdAt": 1764792413163
+    },
+    {
+      "id": "Hb8kwexTqlcRbojgXgjgw",
+      "email": "employee@local",
+      "password": "$2a$08$YivnnEc80Y99s2U367bHTuxGzDYMvdPfTfETaxcgrKtfJZeuK8AWq",
+      "fullName": "Employee User",
+      "role": "EMPLOYEE",
+      "createdAt": 1764792413163
+    }
+  ],
+  "tasks": [
+    {
+      "id": "BGPp3nsOn4JrCOj1Mc8-1",
+      "title": "Initial setup",
+      "description": "Create repo & CI",
+      "assigneeId": "Hb8kwexTqlcRbojgXgjgw",
+      "status": "TODO",
+      "priority": 3,
+      "dueDate": null,
+      "createdBy": "Vo8m_abrjVQVpAwM3TkCZ",
+      "createdAt": 1764792413163,
+      "updatedAt": 1764792413163
+    },
+    {
+      "id": "lY1Y6i5ntPiwBUFv-Ang7",
+      "title": "Design schema",
+      "description": "Define tables",
+      "assigneeId": "Vo8m_abrjVQVpAwM3TkCZ",
+      "status": "IN_PROGRESS",
+      "priority": 2,
+      "dueDate": null,
+      "createdBy": "A6lScs5d7v-wxK5DKk5jK",
+      "createdAt": 1764792413163,
+      "updatedAt": 1764792413163
+    }
+  ],
+  "files": [],
+  "messages": [],
+  "audit": []
+}

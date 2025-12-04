@@ -371,7 +371,7 @@ def dashboard_page():
         col1, col2 = st.columns(2)
         
         with col1:
-            st.markdown("**Task Status Distribution**")
+            st.markdown("**Task Status Distribution (Pie Chart)**")
             df_status = pd.DataFrame(list(by_status.items()), columns=['Status', 'Count'])
             fig = px.pie(df_status, values='Count', names='Status',
                         color_discrete_map={'TODO': '#FFB84D', 'IN_PROGRESS': '#6C5CE7', 'DONE': '#00B894'},
@@ -379,16 +379,40 @@ def dashboard_page():
             st.plotly_chart(fig, use_container_width=True)
         
         with col2:
-            st.markdown(f"**Employee Count**")
+            st.markdown("**Task Status Distribution (Bar Chart)**")
+            df_status = pd.DataFrame(list(by_status.items()), columns=['Status', 'Count'])
+            fig = px.bar(df_status, x='Status', y='Count',
+                        color='Status',
+                        color_discrete_map={'TODO': '#FFB84D', 'IN_PROGRESS': '#6C5CE7', 'DONE': '#00B894'},
+                        title='Task Count by Status')
+            st.plotly_chart(fig, use_container_width=True)
+        
+        st.divider()
+        col3, col4 = st.columns(2)
+        
+        with col3:
+            st.markdown("**Employee Count (Pie Chart)**")
             if employees:
                 role_counts = {}
                 for emp in employees:
                     role_counts[emp.get('role', 'UNKNOWN')] = role_counts.get(emp.get('role', 'UNKNOWN'), 0) + 1
                 df_roles = pd.DataFrame(list(role_counts.items()), columns=['Role', 'Count'])
-                # Create pie chart using plotly
                 fig = px.pie(df_roles, values='Count', names='Role',
                              color_discrete_map={'ADMIN': '#ff6b6b', 'MANAGER': '#4ecdc4', 'EMPLOYEE': '#95e1d3'},
                              title='Team Composition')
+                st.plotly_chart(fig, use_container_width=True)
+        
+        with col4:
+            st.markdown("**Employee Count (Bar Chart)**")
+            if employees:
+                role_counts = {}
+                for emp in employees:
+                    role_counts[emp.get('role', 'UNKNOWN')] = role_counts.get(emp.get('role', 'UNKNOWN'), 0) + 1
+                df_roles = pd.DataFrame(list(role_counts.items()), columns=['Role', 'Count'])
+                fig = px.bar(df_roles, x='Role', y='Count',
+                            color='Role',
+                            color_discrete_map={'ADMIN': '#ff6b6b', 'MANAGER': '#4ecdc4', 'EMPLOYEE': '#95e1d3'},
+                            title='Users by Role')
                 st.plotly_chart(fig, use_container_width=True)
     
     # MANAGER DASHBOARD
@@ -407,10 +431,12 @@ def dashboard_page():
         
         st.divider()
         st.markdown("#### Team Workload")
+        
+        # Row 1: Task Distribution
         col1, col2 = st.columns(2)
         
-        with col2:
-            st.markdown("**Task Distribution**")
+        with col1:
+            st.markdown("**Task Distribution (Pie Chart)**")
             df_status = pd.DataFrame(list(by_status.items()), columns=['Status', 'Count'])
             fig = px.pie(df_status, values='Count', names='Status',
                         color_discrete_map={'TODO': '#FFB84D', 'IN_PROGRESS': '#6C5CE7', 'DONE': '#00B894'},
@@ -418,14 +444,44 @@ def dashboard_page():
             st.plotly_chart(fig, use_container_width=True)
         
         with col2:
-            st.markdown("**Priority Levels**")
+            st.markdown("**Task Distribution (Bar Chart)**")
+            df_status = pd.DataFrame(list(by_status.items()), columns=['Status', 'Count'])
+            fig = px.bar(df_status, x='Status', y='Count',
+                        color='Status',
+                        color_discrete_map={'TODO': '#FFB84D', 'IN_PROGRESS': '#6C5CE7', 'DONE': '#00B894'},
+                        title='Tasks by Status')
+            st.plotly_chart(fig, use_container_width=True)
+        
+        # Row 2: Priority Levels
+        st.divider()
+        col3, col4 = st.columns(2)
+        
+        with col3:
+            st.markdown("**Priority Levels (Pie Chart)**")
             if tasks:
                 priority_counts = {}
                 for task in tasks:
                     priority = task.get('priority', 3)
                     priority_counts[priority] = priority_counts.get(priority, 0) + 1
                 df_priority = pd.DataFrame(list(priority_counts.items()), columns=['Priority', 'Count'])
-                st.bar_chart(df_priority.set_index('Priority'))
+                fig = px.pie(df_priority, values='Count', names='Priority',
+                            color_discrete_sequence=['#FF6B6B', '#FF8E72', '#FFB84D', '#A29BFE', '#6C5CE7'],
+                            title='Priority Breakdown')
+                st.plotly_chart(fig, use_container_width=True)
+        
+        with col4:
+            st.markdown("**Priority Levels (Bar Chart)**")
+            if tasks:
+                priority_counts = {}
+                for task in tasks:
+                    priority = task.get('priority', 3)
+                    priority_counts[priority] = priority_counts.get(priority, 0) + 1
+                df_priority = pd.DataFrame(list(priority_counts.items()), columns=['Priority', 'Count'])
+                fig = px.bar(df_priority, x='Priority', y='Count',
+                            color='Priority',
+                            color_discrete_sequence=['#FF6B6B', '#FF8E72', '#FFB84D', '#A29BFE', '#6C5CE7'],
+                            title='Tasks by Priority')
+                st.plotly_chart(fig, use_container_width=True)
     
     # EMPLOYEE DASHBOARD
     else:
@@ -680,9 +736,10 @@ def reports_page():
                 status_counts[status] = status_counts.get(status, 0) + 1
                 priority_counts[priority] = priority_counts.get(priority, 0) + 1
             
+            # Row 1: Status charts
             col1, col2 = st.columns(2)
             with col1:
-                st.markdown("**Task Status Distribution**")
+                st.markdown("**Task Status - Pie Chart**")
                 df_status = pd.DataFrame(list(status_counts.items()), columns=['Status', 'Count'])
                 fig = px.pie(df_status, values='Count', names='Status',
                             color_discrete_map={'TODO': '#FFB84D', 'IN_PROGRESS': '#6C5CE7', 'DONE': '#00B894'},
@@ -690,11 +747,56 @@ def reports_page():
                 st.plotly_chart(fig, use_container_width=True)
             
             with col2:
-                st.markdown("**Priority Distribution**")
+                st.markdown("**Task Status - Bar Chart**")
+                df_status = pd.DataFrame(list(status_counts.items()), columns=['Status', 'Count'])
+                fig = px.bar(df_status, x='Status', y='Count',
+                            color='Status',
+                            color_discrete_map={'TODO': '#FFB84D', 'IN_PROGRESS': '#6C5CE7', 'DONE': '#00B894'},
+                            title='Count by Status',
+                            text='Count')
+                fig.update_traces(textposition='auto')
+                st.plotly_chart(fig, use_container_width=True)
+            
+            # Row 2: Priority charts
+            st.divider()
+            col3, col4 = st.columns(2)
+            
+            with col3:
+                st.markdown("**Priority Distribution - Pie Chart**")
                 df_priority = pd.DataFrame(list(priority_counts.items()), columns=['Priority', 'Count'])
                 fig = px.pie(df_priority, values='Count', names='Priority',
                             color_discrete_sequence=['#FF6B6B', '#FF8E72', '#FFB84D', '#A29BFE', '#6C5CE7'],
                             title='Priority Breakdown')
+                st.plotly_chart(fig, use_container_width=True)
+            
+            with col4:
+                st.markdown("**Priority Distribution - Bar Chart**")
+                df_priority = pd.DataFrame(list(priority_counts.items()), columns=['Priority', 'Count'])
+                fig = px.bar(df_priority, x='Priority', y='Count',
+                            color='Priority',
+                            color_discrete_sequence=['#FF6B6B', '#FF8E72', '#FFB84D', '#A29BFE', '#6C5CE7'],
+                            title='Count by Priority',
+                            text='Count')
+                fig.update_traces(textposition='auto')
+                st.plotly_chart(fig, use_container_width=True)
+            
+            # Row 3: Combined analysis
+            st.divider()
+            st.markdown("**Combined Task Overview - Sunburst Chart**")
+            if tasks:
+                analysis_data = []
+                for task in tasks:
+                    analysis_data.append({
+                        'Status': task.get('status', 'TODO'),
+                        'Priority': f"Priority {task.get('priority', 3)}",
+                        'Count': 1
+                    })
+                df_analysis = pd.DataFrame(analysis_data)
+                df_agg = df_analysis.groupby(['Status', 'Priority']).size().reset_index(name='Count')
+                
+                fig = px.sunburst(df_agg, labels='Status', parents='', values='Count',
+                                color='Count', color_continuous_scale='Viridis',
+                                title='Task Distribution Overview')
                 st.plotly_chart(fig, use_container_width=True)
     
     with tab3:
@@ -719,6 +821,67 @@ def reports_page():
                     st.metric("Completion Rate", f"{completion_rate:.1f}%")
                 with col3:
                     st.metric("Pending Tasks", total - completed)
+                
+                st.divider()
+                st.markdown("#### Completion Rate Visualization")
+                
+                # Row 1: Gauge and Progress
+                col4, col5 = st.columns(2)
+                
+                with col4:
+                    st.markdown("**Completion Rate - Gauge Chart**")
+                    fig = px.indicator(mode="gauge+number+delta",
+                                     value=completion_rate,
+                                     title={'text': "Task Completion %"},
+                                     domain={'x': [0, 100], 'y': [0, 100]},
+                                     gauge={'axis': {'range': [None, 100]},
+                                           'bar': {'color': '#00B894'},
+                                           'steps': [
+                                               {'range': [0, 33], 'color': '#FFB84D'},
+                                               {'range': [33, 66], 'color': '#FFB84D'},
+                                               {'range': [66, 100], 'color': '#00B894'}
+                                           ],
+                                           'threshold': {'line': {'color': 'red', 'width': 4},
+                                                       'thickness': 0.75,
+                                                       'value': 90}})
+                    st.plotly_chart(fig, use_container_width=True)
+                
+                with col5:
+                    st.markdown("**Task Completion - Horizontal Bar**")
+                    completion_data = pd.DataFrame({
+                        'Category': ['Completed', 'Pending'],
+                        'Count': [completed, total - completed]
+                    })
+                    fig = px.bar(completion_data, y='Category', x='Count',
+                               orientation='h',
+                               color='Category',
+                               color_discrete_map={'Completed': '#00B894', 'Pending': '#FFB84D'},
+                               text='Count',
+                               title='Task Completion Status')
+                    fig.update_traces(textposition='auto')
+                    st.plotly_chart(fig, use_container_width=True)
+                
+                # Row 2: Status breakdown
+                st.divider()
+                st.markdown("**Status Breakdown - All Chart Types**")
+                col6, col7 = st.columns(2)
+                
+                with col6:
+                    st.markdown("**Status Distribution**")
+                    df_status = pd.DataFrame(list(by_status.items()), columns=['Status', 'Count'])
+                    fig = px.pie(df_status, values='Count', names='Status',
+                                color_discrete_map={'TODO': '#FFB84D', 'IN_PROGRESS': '#6C5CE7', 'DONE': '#00B894'},
+                                title='Task Status Pie')
+                    st.plotly_chart(fig, use_container_width=True)
+                
+                with col7:
+                    st.markdown("**Status Count - Donut Chart**")
+                    df_status = pd.DataFrame(list(by_status.items()), columns=['Status', 'Count'])
+                    fig = px.pie(df_status, values='Count', names='Status',
+                                color_discrete_map={'TODO': '#FFB84D', 'IN_PROGRESS': '#6C5CE7', 'DONE': '#00B894'},
+                                hole=0.4,
+                                title='Task Status Donut')
+                    st.plotly_chart(fig, use_container_width=True)
         else:
             st.info("Performance metrics available for managers and admins")
 

@@ -31,6 +31,14 @@
       "role": "EMPLOYEE",
       "password": "$2a$08$k5sBQaFexrubrNMBLpv7/eAm7GAMtctJ4KFBzGfSECjJNMDjI/fv6",
       "createdAt": 1764828189752
+    },
+    {
+      "id": "tiwRASEcLbMLdwa3ERFPq",
+      "email": "ss@ss",
+      "fullName": "ssss",
+      "role": "EMPLOYEE",
+      "password": "$2a$08$BLaVGLwVbkItt0QhSOy.ouPAPPyn2RMOKp/WzW4pgIZFK5Ev5x2ea",
+      "createdAt": 1764828860241
     }
   ],
   "tasks": [
@@ -80,6 +88,13 @@
       "by": "A6lScs5d7v-wxK5DKk5jK",
       "target": "sGy-dOBRu2SSDwvZhLdjE",
       "at": 1764828189755
+    },
+    {
+      "id": "ekqLkkrl9xC0xPibrJlPr",
+      "action": "EMPLOYEE_SIGNUP",
+      "by": null,
+      "target": "tiwRASEcLbMLdwa3ERFPq",
+      "at": 1764828860244
     }
   ]
 }

@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import json
 from io import BytesIO
 import base64
+import plotly.express as px
 
 # Streamlit Page Config
 st.set_page_config(
@@ -90,25 +91,56 @@ st.markdown("""
     
     .role-badge {
         display: inline-block;
-        padding: 4px 12px;
+        padding: 6px 14px;
         border-radius: 20px;
         font-size: 12px;
         font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     
     .role-admin {
-        background: #ff6b6b;
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
         color: white;
+        box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
     }
     
     .role-manager {
-        background: #4ecdc4;
+        background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
         color: white;
+        box-shadow: 0 2px 8px rgba(78, 205, 196, 0.3);
     }
     
     .role-employee {
-        background: #95e1d3;
+        background: linear-gradient(135deg, #95e1d3 0%, #7fdbca 100%);
         color: #333;
+        box-shadow: 0 2px 8px rgba(149, 225, 211, 0.3);
+    }
+    
+    /* Enhanced containers */
+    .stContainer {
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Metric styling */
+    [data-testid="metric-container"] {
+        background: linear-gradient(135deg, #f5f7fa 0%, #eef2f8 100%);
+        padding: 16px;
+        border-radius: 12px;
+        border-left: 4px solid #4ecdc4;
+    }
+    
+    /* Tab styling */
+    .stTabs [data-baseweb="tab-list"] button {
+        border-radius: 8px 8px 0 0 !important;
+        font-weight: 600;
+    }
+    
+    /* Success/Error messages */
+    .stAlert {
+        border-radius: 8px;
+        padding: 12px 16px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -341,16 +373,23 @@ def dashboard_page():
         with col1:
             st.markdown("**Task Status Distribution**")
             df_status = pd.DataFrame(list(by_status.items()), columns=['Status', 'Count'])
-            st.bar_chart(df_status.set_index('Status'))
+            fig = px.pie(df_status, values='Count', names='Status',
+                        color_discrete_map={'TODO': '#FFB84D', 'IN_PROGRESS': '#6C5CE7', 'DONE': '#00B894'},
+                        title='Task Status Breakdown')
+            st.plotly_chart(fig, use_container_width=True)
         
         with col2:
-            st.markdown("**Employee Count**")
+            st.markdown(f"**Employee Count**")
             if employees:
                 role_counts = {}
                 for emp in employees:
                     role_counts[emp.get('role', 'UNKNOWN')] = role_counts.get(emp.get('role', 'UNKNOWN'), 0) + 1
                 df_roles = pd.DataFrame(list(role_counts.items()), columns=['Role', 'Count'])
-                st.bar_chart(df_roles.set_index('Role'))
+                # Create pie chart using plotly
+                fig = px.pie(df_roles, values='Count', names='Role',
+                             color_discrete_map={'ADMIN': '#ff6b6b', 'MANAGER': '#4ecdc4', 'EMPLOYEE': '#95e1d3'},
+                             title='Team Composition')
+                st.plotly_chart(fig, use_container_width=True)
     
     # MANAGER DASHBOARD
     elif role == 'MANAGER':
@@ -370,10 +409,13 @@ def dashboard_page():
         st.markdown("#### Team Workload")
         col1, col2 = st.columns(2)
         
-        with col1:
+        with col2:
             st.markdown("**Task Distribution**")
             df_status = pd.DataFrame(list(by_status.items()), columns=['Status', 'Count'])
-            st.bar_chart(df_status.set_index('Status'))
+            fig = px.pie(df_status, values='Count', names='Status',
+                        color_discrete_map={'TODO': '#FFB84D', 'IN_PROGRESS': '#6C5CE7', 'DONE': '#00B894'},
+                        title='Workload Distribution')
+            st.plotly_chart(fig, use_container_width=True)
         
         with col2:
             st.markdown("**Priority Levels**")
@@ -642,12 +684,18 @@ def reports_page():
             with col1:
                 st.markdown("**Task Status Distribution**")
                 df_status = pd.DataFrame(list(status_counts.items()), columns=['Status', 'Count'])
-                st.bar_chart(df_status.set_index('Status'))
+                fig = px.pie(df_status, values='Count', names='Status',
+                            color_discrete_map={'TODO': '#FFB84D', 'IN_PROGRESS': '#6C5CE7', 'DONE': '#00B894'},
+                            title='Status Overview')
+                st.plotly_chart(fig, use_container_width=True)
             
             with col2:
                 st.markdown("**Priority Distribution**")
                 df_priority = pd.DataFrame(list(priority_counts.items()), columns=['Priority', 'Count'])
-                st.bar_chart(df_priority.set_index('Priority'))
+                fig = px.pie(df_priority, values='Count', names='Priority',
+                            color_discrete_sequence=['#FF6B6B', '#FF8E72', '#FFB84D', '#A29BFE', '#6C5CE7'],
+                            title='Priority Breakdown')
+                st.plotly_chart(fig, use_container_width=True)
     
     with tab3:
         if role in ['ADMIN', 'MANAGER']:
@@ -699,6 +747,11 @@ def employees_page():
     with tab1:
         employees = api_call("GET", "/users")
 
+        if employees is None:
+            st.error("Unable to load team members. Please ensure you have proper permissions.")
+            st.info("Note: Only Admin and Manager roles can view the team list.")
+            return
+
         if employees:
             st.markdown("#### Employees")
 
@@ -726,29 +779,30 @@ def employees_page():
                         st.info("Delete cancelled")
 
             for emp in employees:
-                cols = st.columns([3, 3, 2, 1])
-                with cols[0]:
-                    st.markdown(f"**{emp.get('fullName', '')}**")
-                    st.caption(emp.get('email', ''))
-                with cols[1]:
-                    st.markdown(get_role_badge(emp.get('role', 'EMPLOYEE')), unsafe_allow_html=True)
-                with cols[2]:
-                    eid = emp.get('id', '') or ''
-                    st.caption(eid[:8] + '...' if len(eid) > 8 else eid)
-                with cols[3]:
-                    # Determine if current user can delete this employee (frontend guard; backend enforces rules too)
-                    can_delete = False
-                    if role == 'ADMIN':
-                        can_delete = True
-                    elif role == 'MANAGER' and emp.get('role') == 'EMPLOYEE':
-                        can_delete = True
+                with st.container(border=True):
+                    cols = st.columns([3, 3, 2, 1])
+                    with cols[0]:
+                        st.markdown(f"**{emp.get('fullName', '')}**")
+                        st.caption(emp.get('email', ''))
+                    with cols[1]:
+                        st.markdown(get_role_badge(emp.get('role', 'EMPLOYEE')), unsafe_allow_html=True)
+                    with cols[2]:
+                        eid = emp.get('id', '') or ''
+                        st.caption(eid[:8] + '...' if len(eid) > 8 else eid)
+                    with cols[3]:
+                        # Determine if current user can delete this employee (frontend guard; backend enforces rules too)
+                        can_delete = False
+                        if role == 'ADMIN':
+                            can_delete = True
+                        elif role == 'MANAGER' and emp.get('role') == 'EMPLOYEE':
+                            can_delete = True
 
-                    if can_delete:
-                        # two-step delete: set confirmation state first
-                        if st.button("Delete", key=f"delete-{emp.get('id', '')}", use_container_width=True):
-                            st.session_state.confirm_delete = emp.get('id')
-                            st.session_state.confirm_delete_name = emp.get('fullName')
-                            st.experimental_rerun()
+                        if can_delete:
+                            # two-step delete: set confirmation state first
+                            if st.button("Delete", key=f"delete-{emp.get('id', '')}", use_container_width=True):
+                                st.session_state.confirm_delete = emp.get('id')
+                                st.session_state.confirm_delete_name = emp.get('fullName')
+                                st.experimental_rerun()
 
             st.caption(f"Total: {len(employees)} employee(s)")
         else:

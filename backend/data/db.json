@@ -23,6 +23,14 @@
       "fullName": "Employee User",
       "role": "EMPLOYEE",
       "createdAt": 1764792413163
+    },
+    {
+      "id": "sGy-dOBRu2SSDwvZhLdjE",
+      "email": "john@rljit.in",
+      "fullName": "john doe",
+      "role": "EMPLOYEE",
+      "password": "$2a$08$k5sBQaFexrubrNMBLpv7/eAm7GAMtctJ4KFBzGfSECjJNMDjI/fv6",
+      "createdAt": 1764828189752
     }
   ],
   "tasks": [
@@ -49,9 +57,29 @@
       "createdBy": "A6lScs5d7v-wxK5DKk5jK",
       "createdAt": 1764792413163,
       "updatedAt": 1764792413163
+    },
+    {
+      "id": "v38yDKMYzWN1jQtzva41a",
+      "title": "submit",
+      "description": "idividual",
+      "assigneeId": null,
+      "status": "TODO",
+      "priority": 3,
+      "dueDate": null,
+      "createdBy": "A6lScs5d7v-wxK5DKk5jK",
+      "createdAt": 1764828164245,
+      "updatedAt": 1764828164245
     }
   ],
   "files": [],
   "messages": [],
-  "audit": []
+  "audit": [
+    {
+      "id": "ie1gFFm_Myc7d4-mv5eFk",
+      "action": "CREATE_USER",
+      "by": "A6lScs5d7v-wxK5DKk5jK",
+      "target": "sGy-dOBRu2SSDwvZhLdjE",
+      "at": 1764828189755
+    }
+  ]
 }

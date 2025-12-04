@@ -4,8 +4,11 @@ const db = require('../db');
 const { authorize, authMiddleware } = require('../auth');
 const { nanoid } = require('nanoid');
 
-// GET /api/users - admin only
-router.get('/', authorize('ADMIN'), (req, res) => {
+// GET /api/users - admin and manager can view users
+router.get('/', authMiddleware, (req, res) => {
+  if (req.user.role !== 'ADMIN' && req.user.role !== 'MANAGER') {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
   db.read();
   res.json(db.data.users.map(u => ({ id: u.id, email: u.email, fullName: u.fullName, role: u.role, createdAt: u.createdAt })));
 });

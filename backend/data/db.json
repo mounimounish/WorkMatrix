@@ -71,12 +71,12 @@
       "title": "submit",
       "description": "idividual",
       "assigneeId": null,
-      "status": "TODO",
+      "status": "DONE",
       "priority": 3,
       "dueDate": null,
       "createdBy": "A6lScs5d7v-wxK5DKk5jK",
       "createdAt": 1764828164245,
-      "updatedAt": 1764828164245
+      "updatedAt": 1764831064523
     }
   ],
   "files": [],

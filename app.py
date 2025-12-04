@@ -338,7 +338,11 @@ def dashboard_page():
     # Fetch data
     tasks = api_call("GET", "/tasks")
     summary = api_call("GET", "/dashboard/summary")
-    employees = api_call("GET", "/users")
+    
+    # Only fetch employees for ADMIN and MANAGER roles
+    employees = None
+    if role in ['ADMIN', 'MANAGER']:
+        employees = api_call("GET", "/users")
     
     if not (summary and tasks):
         st.warning("No data available")
@@ -485,7 +489,7 @@ def dashboard_page():
     
     # EMPLOYEE DASHBOARD
     else:
-        st.markdown("#### My Tasks")
+        st.markdown("#### My Tasks Overview")
         col1, col2, col3 = st.columns(3)
         
         with col1:
@@ -495,6 +499,29 @@ def dashboard_page():
         with col3:
             pending = by_status.get('TODO', 0) + by_status.get('IN_PROGRESS', 0)
             st.metric("Pending", pending)
+        
+        st.divider()
+        st.markdown("#### Task Distribution")
+        col4, col5 = st.columns(2)
+        
+        with col4:
+            st.markdown("**My Tasks by Status (Pie)**")
+            df_status = pd.DataFrame(list(by_status.items()), columns=['Status', 'Count'])
+            fig = px.pie(df_status, values='Count', names='Status',
+                        color_discrete_map={'TODO': '#FFB84D', 'IN_PROGRESS': '#6C5CE7', 'DONE': '#00B894'},
+                        title='Task Status Distribution')
+            st.plotly_chart(fig, use_container_width=True)
+        
+        with col5:
+            st.markdown("**My Tasks by Status (Bar)**")
+            df_status = pd.DataFrame(list(by_status.items()), columns=['Status', 'Count'])
+            fig = px.bar(df_status, x='Status', y='Count',
+                        color='Status',
+                        color_discrete_map={'TODO': '#FFB84D', 'IN_PROGRESS': '#6C5CE7', 'DONE': '#00B894'},
+                        text='Count',
+                        title='Task Count by Status')
+            fig.update_traces(textposition='auto')
+            st.plotly_chart(fig, use_container_width=True)
     
     st.divider()
     st.markdown("#### Recent Tasks")
